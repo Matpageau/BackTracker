@@ -2,6 +2,9 @@
 import { connectToDatabase } from '@/lib/mongoose'
 import { User } from '@/models/User'
 import { NextResponse } from 'next/server'
+import bcrypt from 'bcrypt'
+import jwt from "jsonwebtoken"
+import { cookies } from 'next/headers'
 
 export async function POST(request: Request) {
   const { email, password } = await request.json()
@@ -17,11 +20,24 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'User not found' }, { status: 401 })
   }
 
-  //Decrypter le password
-
-  if (user.password !== password) {
+  const match = await bcrypt.compare(password, user.password)
+  if (!match) {
     return NextResponse.json({ message: 'Wrong password' }, { status: 401 })
   }
+
+  const token = jwt.sign(
+    { userId: user._id },
+    process.env.JWT_SECRET!,
+    { expiresIn: '7d'}
+  );
+
+  (await cookies()).set('token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 60 * 60 * 24 * 7, // 7 jours
+  })
 
   return NextResponse.json({ message: 'Login successful' }, { status: 200 })
 }

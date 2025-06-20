@@ -1,16 +1,21 @@
 "use client"
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function Register() {
+  const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [retypedPassword, setRetypedPassword] = useState("")
   const [userName, setUsername] = useState("")
   const [fullName, setFullName] = useState("")
-  const [message, setMessage] = useState("")
+  const [error, setError] = useState("")
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setMessage("")
+    setError("")
+
+    if(password != retypedPassword) return setError("Passowrds does not match")
 
     const res = await fetch("/api/auth/register", {
       method: "POST",
@@ -18,14 +23,17 @@ export default function Register() {
       body: JSON.stringify({ email, password, userName, fullName })
     })
 
-    const data = await res.json()
-    setMessage(data.message)
+    if(res.ok) {
+      router.push("/")
+    }else{
+      const data = await res.json()
+      setError(data.message)
+    }
   }
 
   return (
     <div className='flex flex-col justify-center items-center h-screen'>
-      <div className='w-2/7'>
-
+      <div className='w-1/4'>
         <form 
           onSubmit={handleSubmit}
           className='flex flex-col border-1 border-neutral-700 p-6 rounded'
@@ -49,6 +57,14 @@ export default function Register() {
               required
             />
             <input 
+              type="password"
+              placeholder='Retype password'
+              value={retypedPassword}
+              onChange={e => setRetypedPassword(e.target.value)}
+              className='border-1 p-2 text-sm mt-2 outline-none bg-[var(--input-background)]'
+              required
+            />
+            <input 
               type="text"
               placeholder='Username'
               value={userName}
@@ -67,11 +83,11 @@ export default function Register() {
             <button
               type='submit'
               className='bg-[var(--main)] rounded mt-3 cursor-pointer hover:bg-[var(--main-hover)] transition-all disabled:cursor-auto disabled:opacity-50 disabled:hover:bg-[var(--main)]'
-              disabled={!(email && password && userName && fullName)}
+              disabled={!(email && password && retypedPassword && userName && fullName)}
             >
               Register
             </button>
-            {message && <p className='mt-3 text-center text-red-500 text-xs'>{message}</p>}
+            {error && <p className='mt-3 text-center text-red-500 text-xs'>{error}</p>}
           </div>
           <div>
           </div>
