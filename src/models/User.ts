@@ -1,6 +1,9 @@
-import mongoose from "mongoose";
+import mongoose, { Model } from "mongoose";
+import { UserType } from "@/types/user"
 
-const UserSchema = new mongoose.Schema({
+interface UserDocument extends UserType, Document {}
+
+const UserSchema = new mongoose.Schema<UserDocument>({
   email: {
     type: String,
     required: true,
@@ -19,11 +22,18 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  private: {
+    type: Boolean,
+    default: true
+  },
   profileImg: {
+    type: String
+  },
+  bio: {
     type: String
   }
 }, {
   timestamps: true
 })
 
-export const User = mongoose.models.User || mongoose.model("User", UserSchema)
+export const User: Model<UserDocument> = mongoose.models.User || mongoose.model<UserDocument>("User", UserSchema)
