@@ -1,6 +1,7 @@
 "use client"
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 export default function Register() {
   const router = useRouter()
@@ -93,7 +94,7 @@ export default function Register() {
           </div>
         </form>
         <div className='flex flex-col border-1 border-neutral-700 p-6 rounded mt-3 w-full'>
-          <p className='text-ms text-center'>You have an account ? <a className='text-[var(--main)]' href="/account/login">Login</a></p>
+          <p className='text-ms text-center'>You have an account ? <Link className='text-[var(--main)]' href="/account/login">Login</Link></p>
         </div>
       </div>
     </div>

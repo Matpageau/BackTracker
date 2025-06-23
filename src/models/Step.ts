@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
 const StepSchema = new mongoose.Schema({
+  post_id: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: "Post"
+  },
   photos: [{
     type: mongoose.SchemaTypes.ObjectId,
     ref: "Photo"

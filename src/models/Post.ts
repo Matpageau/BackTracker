@@ -1,7 +1,10 @@
-import mongoose from "mongoose";
+import mongoose, { Model } from "mongoose";
+import { PostType } from "@/types/post";
 
-const PostSchema = new mongoose.Schema({
-  owner: {
+interface PostDocument extends PostType, Document {}
+
+const PostSchema = new mongoose.Schema<PostDocument>({
+  owner_id: {
     type : mongoose.SchemaTypes.ObjectId,
     ref: "User",
     required: true
@@ -16,11 +19,16 @@ const PostSchema = new mongoose.Schema({
     ref: "Step",
     required: true
   }],
-  tags: {
-    String
+  tags: [{
+    type: String
+  }],
+  status: {
+    type: String,
+    enum: ["private", "public", "draft"],
+    default: "draft"
   }
 }, {
   timestamps: true
 })
 
-export const Post = mongoose.models.Post || mongoose.model("Post", PostSchema)
+export const Post: Model<PostDocument> = mongoose.models.Post || mongoose.model<PostDocument>("Post", PostSchema)

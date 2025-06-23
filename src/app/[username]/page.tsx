@@ -1,11 +1,11 @@
 import ItemGrid from '@/components/Profile/ItemGrid'
-import { connectToDatabase } from '@/lib/mongoose'
-import { Follow } from '@/models/Follow'
-import { Post } from '@/models/Post'
-import { User } from '@/models/User'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import MapClient from '@/components/MapClient/MapClient'
+import { BookImage, SquarePen } from 'lucide-react'
+import Link from 'next/link'
+import { getUserIdFromUsername } from '@/lib/getUserIdByUsername'
+import { getUserPosts, getUserProfile } from '@/services/userService'
 
 type PageProps = {
   params: Promise<{ username: string }>
@@ -14,16 +14,15 @@ type PageProps = {
 export default async function Profil({ params }: PageProps) {
   const { username } = await params
 
-  await connectToDatabase()
-  const user = await User.findOne({ userName: username.toLowerCase() })
+  const userId = await getUserIdFromUsername(username)
+  if (!userId) return notFound()
 
-  if (!user) {
-    notFound()
-  }
+  const [profile, posts] = await Promise.all([
+    getUserProfile(userId),
+    getUserPosts(userId)
+  ])
 
-  const posts = await Post.find({ owner: user._id })
-  const followerCount = await Follow.countDocuments({ followed_user_id: user._id })
-  const followingCount = await Follow.countDocuments({ following_user_id: user._id })
+  if (!profile) return notFound()
   
   return (
     <div className='flex w-full p-10'>
@@ -33,7 +32,7 @@ export default async function Profil({ params }: PageProps) {
             <div className='flex'>
               <div className='w-1/3'>
                 <Image 
-                  src={user.profileImg ?? "/defautProfile.jpg"}
+                  src={profile.user.profileImg ?? "/defautProfile.jpg"}
                   alt='profile picture'
                   width={120}
                   height={120}
@@ -41,18 +40,26 @@ export default async function Profil({ params }: PageProps) {
                 />
               </div>
               <div className='flex flex-col w-2/3 justify-between'>
-                <p className='text-2xl'>{user.userName}</p>
+                <p className='text-2xl'>{profile.user.userName}</p>
                 <div className='flex gap-10'>
-                  <p><strong>{posts.length}</strong> Travel{posts.length > 1 ? "s" : ""}</p>
-                  <p><strong>{posts.length}</strong> km travelled{posts.length > 1 ? "s" : ""}</p>
-                  <p><strong>{followerCount}</strong> follower{followerCount > 1 ? "s" : ""}</p>
-                  <p><strong>{followingCount}</strong> following</p>
+                  <p><strong>{profile.stats.postsCount}</strong> Travel{profile.stats.postsCount > 1 ? "s" : ""}</p>
+                  <p><strong>{profile.stats.postsCount}</strong> km travelled{profile.stats.postsCount > 1 ? "s" : ""}</p>
+                  <p><strong>{profile.stats.followerCount}</strong> follower{profile.stats.followerCount > 1 ? "s" : ""}</p>
+                  <p><strong>{profile.stats.followingCount}</strong> following</p>
                 </div>
-                <p>{user.bio}</p>
+                <p>{profile.user.bio}</p>
               </div>
             </div>
           </div>
-          <ItemGrid items={[]}/>
+          <div>
+            <div className='flex justify-center gap-50 mt-3'>
+              <Link href={`/${profile.user.userName}`}>
+                <BookImage className='bg-[var(--main)] p-2 rounded' height={40} width={40}/>
+              </Link>
+              <SquarePen className='p-2 rounded' height={40} width={40}/>
+            </div>
+            <ItemGrid items={posts}/>
+          </div>
         </div>
       </div>
       <div className='w-1/2 ml-5 h-full'>

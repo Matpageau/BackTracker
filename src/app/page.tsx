@@ -1,3 +1,4 @@
+import CreatePostButton from "@/components/Other/Buttons/NewPost";
 import ProfileLinkComp from "@/components/ProfileLinkComp/ProfileLinkComp";
 import { getCurrentUser } from "@/lib/getCurrentUser";
 
@@ -14,7 +15,7 @@ export default async function Home() {
         </div>
         <div className="w-1/5 mt-5">
           <ProfileLinkComp user={user}/>
-          <button className="bg-[var(--main)] py-1 px-3 rounded-full mt-3 cursor-pointer transition-colors hover:bg-[var(--main-hover)]">Create a post</button>
+          <CreatePostButton />
         </div>
       </div>
     </div>

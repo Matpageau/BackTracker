@@ -1,5 +1,6 @@
 import { UserType } from '@/types/user'
 import Image from 'next/image'
+import Link from 'next/link'
 import React from 'react'
 
 type ProfileLinkProps = {
@@ -9,7 +10,7 @@ type ProfileLinkProps = {
 const ProfileLinkComp: React.FC<ProfileLinkProps> = ({ user }) => {
   return (
     <div className='flex'>
-      <a href={`/${user.userName}`}>
+      <Link href={`/${user.userName}`}>
         <Image 
           src={user.profileImg ?? "/defautProfile.jpg"}
           alt='profile picture'
@@ -17,7 +18,7 @@ const ProfileLinkComp: React.FC<ProfileLinkProps> = ({ user }) => {
           height={44}
           className='rounded-full'
         />
-      </a>
+      </Link>
       <div className='ml-3'>
         <a href={`/${user.userName}`}>{user.userName}</a>
         <p className='text-neutral-400 text-sm'>{user.fullName}</p>
