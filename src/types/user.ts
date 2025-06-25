@@ -2,7 +2,7 @@ export interface UserType {
   _id?: string
   email: string
   password: string
-  userName: string
+  username: string
   fullName: string
   private: boolean
   profileImg?: string

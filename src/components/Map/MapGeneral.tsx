@@ -22,7 +22,7 @@ export default function MapClient() {
 
     map.on("load", () => {
       
-      new mapboxgl.Marker().setLngLat([-73.5673, 45.5017]).addTo(map)
+      
     })
 
     return () => map.remove()

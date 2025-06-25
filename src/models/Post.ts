@@ -9,6 +9,10 @@ const PostSchema = new mongoose.Schema<PostDocument>({
     ref: "User",
     required: true
   },
+  description: {
+    type: String,
+    default: ""
+  },
   photos: [{
     type: mongoose.SchemaTypes.ObjectId,
     ref: "Photo",

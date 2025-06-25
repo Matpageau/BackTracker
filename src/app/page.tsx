@@ -1,5 +1,5 @@
-import CreatePostButton from "@/components/Other/Buttons/NewPost";
-import ProfileLinkComp from "@/components/ProfileLinkComp/ProfileLinkComp";
+import CreatePostButton from "@/components/Buttons/NewPost";
+import ProfileLinkComp from "@/components/Profile/ProfileLinkComp/ProfileLinkComp";
 import { getCurrentUser } from "@/lib/getCurrentUser";
 
 export default async function Home() {

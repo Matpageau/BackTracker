@@ -13,7 +13,7 @@ const UserSchema = new mongoose.Schema<UserDocument>({
     type: String,
     required: true
   },
-  userName: {
+  username: {
     type: String,
     required: true,
     unique: true

@@ -1,28 +1,39 @@
 import ItemGrid from '@/components/Profile/ItemGrid'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
-import MapClient from '@/components/MapClient/MapClient'
+import MapClient from '@/components/Map/MapGeneral'
 import { BookImage, SquarePen } from 'lucide-react'
 import Link from 'next/link'
-import { getUserIdFromUsername } from '@/lib/getUserIdByUsername'
-import { getUserPosts, getUserProfile } from '@/services/userService'
+import React from 'react'
+import { UserType } from '@/types/user'
+import { PostType } from '@/types/post'
+import { getCurrentUser } from '@/lib/getCurrentUser'
 
-type PageProps = {
-  params: Promise<{ username: string }>
+interface PageProps {
+  params: Promise<{ 
+    username: string 
+  }>
 }
 
 export default async function Profil({ params }: PageProps) {
-  const { username } = await params
+  const username = (await params).username
 
-  const userId = await getUserIdFromUsername(username)
-  if (!userId) return notFound()
-
-  const [profile, posts] = await Promise.all([
-    getUserProfile(userId),
-    getUserPosts(userId)
+  const [currentUser, resUser] = await Promise.all([
+    getCurrentUser(),
+    fetch(`http://localhost:3000/api/user/by-username/${username}`, {
+      cache: "force-cache"
+    })
   ])
 
-  if (!profile) return notFound()
+  if (!resUser.ok) return notFound()
+  const user = await resUser.json() as UserType
+  
+  const resUserProfile = await fetch(`http://localhost:3000/api/user/${user._id}/profile`, {
+    cache: "force-cache"
+  })
+  if (!resUserProfile.ok) return notFound()
+  const posts = await resUserProfile.json() as PostType[]
+  
   
   return (
     <div className='flex w-full p-10'>
@@ -32,7 +43,7 @@ export default async function Profil({ params }: PageProps) {
             <div className='flex'>
               <div className='w-1/3'>
                 <Image 
-                  src={profile.user.profileImg ?? "/defautProfile.jpg"}
+                  src={user.profileImg ?? "/defautProfile.jpg"}
                   alt='profile picture'
                   width={120}
                   height={120}
@@ -40,24 +51,26 @@ export default async function Profil({ params }: PageProps) {
                 />
               </div>
               <div className='flex flex-col w-2/3 justify-between'>
-                <p className='text-2xl'>{profile.user.userName}</p>
+                <p className='text-2xl'>{user.username}</p>
                 <div className='flex gap-10'>
-                  <p><strong>{profile.stats.postsCount}</strong> Travel{profile.stats.postsCount > 1 ? "s" : ""}</p>
-                  <p><strong>{profile.stats.postsCount}</strong> km travelled{profile.stats.postsCount > 1 ? "s" : ""}</p>
-                  <p><strong>{profile.stats.followerCount}</strong> follower{profile.stats.followerCount > 1 ? "s" : ""}</p>
-                  <p><strong>{profile.stats.followingCount}</strong> following</p>
+                  <p><strong>{posts.length}</strong> Travel{posts.length > 1 ? "s" : ""}</p>
+                  <p><strong>{posts.length}</strong> km travelled{posts.length > 1 ? "s" : ""}</p>
+                  <p><strong>{posts.length}</strong> follower{posts.length > 1 ? "s" : ""}</p>
+                  <p><strong>{posts.length}</strong> following</p>
                 </div>
-                <p>{profile.user.bio}</p>
+                <p>{user.bio}</p>
               </div>
             </div>
           </div>
           <div>
-            <div className='flex justify-center gap-50 mt-3'>
-              <Link href={`/${profile.user.userName}`}>
-                <BookImage className='bg-[var(--main)] p-2 rounded' height={40} width={40}/>
-              </Link>
-              <SquarePen className='p-2 rounded' height={40} width={40}/>
-            </div>
+            {user._id == currentUser?._id &&
+              <div className='flex justify-center gap-50 mt-3'>
+                <Link href={`/${user.username}`}>
+                  <BookImage className='bg-[var(--main)] p-2 rounded' height={40} width={40}/>
+                </Link>
+                <SquarePen className='p-2 rounded' height={40} width={40}/>
+              </div>
+            }
             <ItemGrid items={posts}/>
           </div>
         </div>

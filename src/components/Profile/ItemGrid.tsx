@@ -15,7 +15,7 @@ const ItemGrid: React.FC<ItemGridProps> = ({ items }) => {
 
   return (
     <div className='grid grid-cols-3'>
-      
+      {/* <p>{items.}</p> */}
     </div>
   )
 }

@@ -10,7 +10,7 @@ type ProfileLinkProps = {
 const ProfileLinkComp: React.FC<ProfileLinkProps> = ({ user }) => {
   return (
     <div className='flex'>
-      <Link href={`/${user.userName}`}>
+      <Link href={`/${user.username}`}>
         <Image 
           src={user.profileImg ?? "/defautProfile.jpg"}
           alt='profile picture'
@@ -20,7 +20,7 @@ const ProfileLinkComp: React.FC<ProfileLinkProps> = ({ user }) => {
         />
       </Link>
       <div className='ml-3'>
-        <a href={`/${user.userName}`}>{user.userName}</a>
+        <a href={`/${user.username}`}>{user.username}</a>
         <p className='text-neutral-400 text-sm'>{user.fullName}</p>
       </div>
     </div>

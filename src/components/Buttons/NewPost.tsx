@@ -11,7 +11,7 @@ export default function CreatePostButton() {
     
     const data = await res.json()
     if(res.ok) {
-      router.push(`/publish/${data.postId}`)
+      router.push(`/create/${data.postId}`)
     }else{
       return
     }

@@ -3,7 +3,11 @@ import React from 'react'
 
 const AddStepBtn = () => {
   return (
-    <Plus />
+    <button
+      className='cursor-pointer'
+    >
+      <Plus />
+    </button>
   )
 }
 

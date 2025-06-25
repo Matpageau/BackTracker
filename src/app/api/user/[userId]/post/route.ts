@@ -1,16 +1,24 @@
-import { getUserPosts } from "@/services/userService"
-import { NextRequest, NextResponse } from "next/server"
+import { connectToDatabase } from '@/lib/mongoose'
+import { Post } from '@/models/Post'
+import { NextResponse } from 'next/server'
 
-type Params = { 
-  params: Promise<{ userId: string }> 
+type Params = {
+  params: Promise<{ userId: string }>
 }
 
-export async function GET(_: NextRequest, { params }: Params) {
- const data = await getUserPosts((await params).userId)
+export async function GET(_request: Request, { params }: Params) {
+  try {
+    await connectToDatabase()
 
-  if(!data) {
-    return NextResponse.json({ message: "No posts found" }, { status: 404 })
+    const { userId } = (await params)
+
+    const posts = await Post.find({ owner_id: userId })
+      .lean()
+    
+    return NextResponse.json(posts, { status: 200 })
+
+  } catch (err) {
+    console.error("Erreur API /user/[userId]/post:", err)
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 })
   }
-
-  return NextResponse.json(data)
 }
