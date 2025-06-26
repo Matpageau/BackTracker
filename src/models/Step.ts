@@ -1,13 +1,24 @@
-import mongoose from "mongoose";
+import { StepType } from "@/types/step";
+import mongoose, { Model } from "mongoose";
 
-const StepSchema = new mongoose.Schema({
+interface StepDocument extends StepType, Document {}
+
+const StepSchema = new mongoose.Schema<StepDocument>({
   post_id: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: "Post"
   },
-  photos: [{
-    type: mongoose.SchemaTypes.ObjectId,
-    ref: "Photo"
+  lng: {
+    type: Number,
+    required: true
+  },
+  lat: {
+    type: Number,
+    required: true
+  },
+  medias: [{
+    type: String,
+    default: []
   }],
   description: {
     type: String
@@ -22,4 +33,4 @@ const StepSchema = new mongoose.Schema({
   timestamps: true
 })
 
-export const Step = mongoose.models.Step || mongoose.model("Step", StepSchema)
+export const Step: Model<StepDocument> = mongoose.models.Step || mongoose.model<StepDocument>("Step", StepSchema)

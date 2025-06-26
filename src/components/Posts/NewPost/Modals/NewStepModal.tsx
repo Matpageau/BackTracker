@@ -3,7 +3,12 @@ import MapPinSelector from '@/components/Map/MapPinSelector'
 import React, { useCallback, useState } from 'react'
 import MediaGallery from '../MediaGallery/MediaGallery'
 
-const NewStepModal = () => {
+type NewStepModalProps = {
+  postId: string
+  onSave: () => void
+}
+
+const NewStepModal: React.FC<NewStepModalProps> = ({ postId, onSave }) => {
   const [lng, setLng] = useState(0)
   const [lat, setLat] = useState(0)
   const [medias, setMedias] = useState<string[]>([])
@@ -14,15 +19,35 @@ const NewStepModal = () => {
     setLat(lat)
   }, [])
 
-  const saveStep = () => {
+  const saveStep = async () => {    
     const stepData = {
       lng,
       lat,
       medias,
       description,
+      postId
     }
 
-    console.log('Save step:', stepData)
+    try {
+      const res = await fetch("/api/step/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(stepData)
+      })
+
+      if (!res.ok) {
+        const err = await res.json()
+        console.error('Erreur:', err.message)
+        return
+      }
+
+      onSave()
+
+    } catch (error) {
+      console.error('Save step error:', error)
+    }
   }
 
   return (

@@ -1,6 +1,6 @@
 import { Plus } from 'lucide-react'
 import Image from 'next/image'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 type MediaGalleryProps = {
   onUpdate: (medias: string[]) => void
@@ -14,12 +14,12 @@ const MediaGallery: React.FC<MediaGalleryProps> = ({ onUpdate }) => {
     if (!files) return
 
     const newUrls = Array.from(files).map(file => URL.createObjectURL(file))
-    setMedias(prev => {
-      const updated = [...prev, ...newUrls]
-      onUpdate(updated)
-      return updated
-    })
+    setMedias(prev => [...prev, ...newUrls])
   }
+
+  useEffect(() => {
+    onUpdate(medias)
+  }, [medias, onUpdate])
 
   return (
     <div className='grid grid-cols-3 gap-4 overflow-y-auto'>

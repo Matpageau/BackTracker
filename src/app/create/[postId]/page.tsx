@@ -1,31 +1,56 @@
+"use client"
 import MapClient from '@/components/Map/MapGeneral'
 import NewStepModal from '@/components/Posts/NewPost/Modals/NewStepModal'
 import AddStepBtn from '@/components/Publish/AddStepBtn'
 import { getCurrentUser } from '@/lib/getCurrentUser'
-import { Post } from '@/models/Post'
+import { PostType } from '@/types/post'
 import mongoose from 'mongoose'
 import { notFound } from 'next/navigation'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 type PageProps = {
   params: Promise<{ postId: string }>
 }
 
-export default async function Publish({ params }: PageProps) {
-  const { postId } = await params
+export default function Publish({ params }: PageProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [post, setPost] = useState<PostType | null>(null)
 
-  if(!mongoose.Types.ObjectId.isValid(postId)) {
-    notFound()
-  }
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { postId } = await params
+      
+        if(!mongoose.Types.ObjectId.isValid(postId)) {
+          notFound()
+        }
+      
+        const resPost = await fetch(`/api/post/${postId}`, {
+          method: "GET"
+        })
+        setPost(await resPost.json())
 
-  const post = await Post.findById(postId)
-  const user = await getCurrentUser()
+        const user = await getCurrentUser()
+      
+        if(!post || (post.owner_id.toString() != user?._id)) notFound()
+      } catch {
+        notFound()
+      }
+    }
 
-  if(!post || (post.owner_id.toString() != user?._id)) notFound()
+    fetchData()
+  }, [])
+
+  if(!post) return notFound()
 
   return (
     <>
-      <NewStepModal />
+      {isModalOpen && 
+        <NewStepModal 
+          postId={post._id.toString()}
+          onSave={() => setIsModalOpen(false)}
+        />
+      }
       <div className='flex w-full p-10'>
         <div className='w-1/3'>
           <div className='bg-neutral-800 rounded-md p-3'>
